@@ -1,0 +1,103 @@
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 420px;
+  background: transparent;
+}
+
+.nobty-logo {
+  width: 320px;
+  max-width: 90vw;
+  overflow: visible;
+}
+
+.draw-main,
+.draw-accent {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.draw-main {
+  stroke: #132249;
+  stroke-width: 5;
+  stroke-dasharray: 2400;
+  stroke-dashoffset: 2400;
+  animation: draw-main 2.1s ease-out forwards 0.35s,
+    fill-main 0.35s ease forwards 2.45s;
+}
+
+.draw-accent {
+  stroke: #4dd1c7;
+  stroke-width: 5;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: draw-accent 0.45s ease-out forwards 1.75s,
+    fill-accent 0.25s ease forwards 2.25s;
+}
+
+.pen-dot {
+  fill: #f2c200;
+  opacity: 0;
+  transform-origin: center;
+  animation: dot-pop 0.18s ease forwards,
+    dot-bounce 0.45s ease-out forwards 0.18s,
+    dot-fade 0.2s ease forwards 0.7s;
+}
+
+@keyframes draw-main {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes draw-accent {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fill-main {
+  to {
+    fill: #132249;
+  }
+}
+
+@keyframes fill-accent {
+  to {
+    fill: #4dd1c7;
+  }
+}
+
+@keyframes dot-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dot-bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-10px) scale(1.08);
+  }
+  70% {
+    transform: translateY(2px) scale(0.96);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dot-fade {
+  to {
+    opacity: 0;
+  }
+}

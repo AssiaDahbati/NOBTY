@@ -1,0 +1,171 @@
+{
+  "navbar": {
+  "home": "Accueil",
+  "businesses": "Entreprises",
+  "login": "Connexion",
+  "register": "Inscription",
+  "about": "À propos",
+  "contact": "Contact",
+  "profile": "Profil",
+  "dashboard": "Tableau de bord",
+  "logout": "Déconnexion"
+},
+  "login": {
+    "welcome": "Bon retour !",
+    "subtitle": "Veuillez entrer vos informations",
+    "email": "E-mail",
+    "emailPlaceholder": "Entrez votre e-mail",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "remember": "Se souvenir de moi",
+    "forgot": "Mot de passe oublié ?",
+    "loginButton": "Connexion",
+    "logging": "Connexion en cours...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "register": "Inscription",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "hero": {
+      "line1": "Les plus avisés n'attendent pas.",
+      "line2": "Planifiez intelligemment avec NOBTY"
+    },
+    "validation": {
+      "required": "Veuillez remplir tous les champs.",
+      "failed": "Échec de la connexion."
+    }
+  },
+  "register": {
+    "brand": "Nobty",
+    "title": "Créez votre compte",
+    "subtitle": "Inscrivez-vous en tant que client ou propriétaire d’entreprise.",
+    "accountType": "Type de compte",
+    "email": "E-mail",
+    "phone": "Numéro de téléphone",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "submit": "S'inscrire",
+    "creating": "Création du compte...",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "login": "Connexion",
+    "success": "Compte créé avec succès.",
+    "error": "Échec de l'inscription.",
+    "roles": {
+      "customer": "Client",
+      "businessOwner": "Propriétaire d’entreprise"
+    },
+    "placeholders": {
+      "email": "Entrez votre e-mail",
+      "phone": "+212XXXXXXXXX",
+      "password": "Créez un mot de passe",
+      "confirmPassword": "Confirmez votre mot de passe",
+      "businessName": "Entrez le nom de l’entreprise",
+      "address": "Entrez l’adresse",
+      "description": "Parlez aux utilisateurs de votre entreprise"
+    },
+    "validation": {
+      "required": "Veuillez remplir tous les champs obligatoires.",
+      "invalidPhone": "Veuillez entrer un numéro de téléphone valide.",
+      "passwordLength": "Le mot de passe doit contenir au moins 6 caractères.",
+      "passwordMatch": "Les mots de passe ne correspondent pas.",
+      "businessRequired": "Le nom de l’entreprise, la catégorie et la ville sont obligatoires pour les propriétaires d’entreprise."
+    },
+    "businessInfo": {
+      "title": "Informations sur l’entreprise",
+      "businessName": "Nom de l’entreprise",
+      "category": "Catégorie",
+      "city": "Ville",
+      "address": "Adresse",
+      "description": "Description",
+      "note": "Les horaires hebdomadaires par défaut seront ajoutés automatiquement. Votre entreprise restera en attente jusqu’à l’approbation de l’administrateur."
+    },
+    "categoryOptions": {
+      "select": "Sélectionnez une catégorie",
+      "beautySalon": "Salon de beauté",
+      "clinic": "Clinique",
+      "hospital": "Hôpital",
+      "bank": "Banque",
+      "governmentService": "Service gouvernemental",
+      "embassyConsulate": "Ambassade / Consulat",
+      "medicalLab": "Laboratoire médical",
+      "languageTestCenter": "Centre de test de langue"
+    },
+    "cityOptions": {
+      "select": "Sélectionnez une ville",
+      "casablanca": "Casablanca",
+      "rabat": "Rabat",
+      "tangier": "Tanger"
+    },
+    "panel": {
+      "customer": {
+        "badge": "Client",
+        "title": "Les rendez-vous intelligents commencent ici",
+        "description": "Découvrez les services, explorez les entreprises et réservez vos rendez-vous facilement en quelques clics.",
+        "pill1": "Réservation rapide",
+        "pill2": "Gain de temps"
+      },
+      "business": {
+        "badge": "Entreprise",
+        "title": "Développez votre entreprise avec Nobty",
+        "description": "Créez le profil de votre entreprise, gagnez en visibilité et gérez vos rendez-vous facilement.",
+        "pill1": "Plus de visibilité",
+        "pill2": "Meilleure organisation"
+      }
+    }
+  },
+"contact": {
+  "hero": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider à gérer vos rendez-vous plus intelligemment avec Nobty",
+    "quote": "Votre temps compte. Nobty vous aide à réserver plus intelligemment et à attendre moins."
+  },
+  "left": {
+    "title": "Entrer en contact",
+    "subtitle": "Que vous soyez un client cherchant de l'aide ou une entreprise souhaitant rejoindre Nobty, notre équipe est là pour vous.",
+    "careTitle": "Nous prenons soin de nos clients",
+    "careText": "Chaque message compte pour nous. Nous visons à répondre rapidement, clairement et avec attention.",
+    "officeTitle": "Siège social",
+    "officeLine1": "Casablanca, Maroc",
+    "officeLine2": "Siège de Nobty",
+    "emailTitle": "Écrivez-nous",
+    "phoneTitle": "Appelez-nous",
+    "phoneLine1": "Téléphone : +212 600 000 000",
+    "phoneLine2": "Bureau : +212 522 000 000"
+  },
+  "form": {
+    "title": "Envoyez-nous un message",
+    "contactAs": "Je contacte Nobty en tant que :",
+    "customer": "Client",
+    "business": "Entreprise",
+    "name": "Nom",
+    "email": "E-mail",
+    "subject": "Sujet",
+    "businessSubject": "Sujet professionnel",
+    "message": "Écrivez votre message...",
+    "businessMessage": "Parlez-nous de votre demande professionnelle...",
+    "send": "Envoyer",
+    "sending": "Envoi en cours..."
+  },
+  "validation": {
+    "required": "Veuillez remplir tous les champs.",
+    "success": "Message envoyé avec succès !",
+    "failed": "Échec de l'envoi du message."
+  },
+  "footer": {
+    "brandText": "Réservation intelligente de rendez-vous pour les clients et les entreprises.",
+    "company": "Entreprise",
+    "home": "Accueil",
+    "businesses": "Entreprises",
+    "about": "À propos",
+    "contact": "Contact",
+    "support": "Support",
+    "helpCenter": "Centre d'aide",
+    "myAccount": "Mon compte",
+    "contactSupport": "Contacter le support",
+    "newsletter": "Newsletter",
+    "newsletterText": "Recevez les actualités et nouveautés Nobty directement dans votre boîte mail.",
+    "email": "E-mail",
+    "signUp": "S'inscrire",
+    "rights": "Tous droits réservés."
+  }
+}
+}

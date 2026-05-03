@@ -1,0 +1,82 @@
+### Register
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "Test User",
+  "email": "test@example.com",
+  "password": "123456"
+}
+
+###
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456"
+}
+
+###
+### Create business (auth)
+POST http://localhost:5000/api/businesses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YWExNjMzNTM4NTE2ODYzNTIwNzg0MCIsImlhdCI6MTc3Mjc1NDQ5OCwiZXhwIjoxNzczMzU5Mjk4fQ.Z-z-Az9XwMF0b7daeMSTIbDaVnYnl8Z25y_kCm_77D8
+
+{
+  "name": "NOBTY Clinic",
+  "category": "clinic",
+  "description": "Modern clinic using NOBTY.",
+  "address": "Main Street 123",
+  "city": "Algiers",
+  "open": "09:00",
+  "close": "18:00"
+}
+###
+
+
+### Create service
+POST http://localhost:5000/api/services
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YWExNjMzNTM4NTE2ODYzNTIwNzg0MCIsImlhdCI6MTc3Mjc1NDQ5OCwiZXhwIjoxNzczMzU5Mjk4fQ.Z-z-Az9XwMF0b7daeMSTIbDaVnYnl8Z25y_kCm_77D8
+
+{
+  "businessId": "69aa7b96ca2baeb5fa28b1c7",
+  "name": "General Consultation",
+  "description": "Doctor check-up and advice",
+  "price": 2000,
+  "duration": 30
+}
+###
+
+### Create appointment
+POST http://localhost:5000/api/appointments
+Content-Type: application/json
+
+
+{
+  "userId": "69aa7b96ca2baeb5fa28b1c7",
+  "businessId": "69aa7b96ca2baeb5fa28b1c7",
+  "serviceId": "69aa7bcfca2baeb5fa28b1c9",
+  "date": "2026-04-10",
+  "time": "14:00"
+}
+
+### Get service by ID
+GET http://localhost:5000/api/services/69aa7bcfca2baeb5fa28b1c9
+
+### Create service
+POST http://localhost:5000/api/services
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTM4NzFjYzQ3MjUyNGNlMzYzYWNjOSIsImlhdCI6MTc3MjcwNDQ1NywiZXhwIjoxNzczMzA5MjU3fQ.h5w0MCRHZwcCiA8A4putmS_w3rgHKQ6V9aOh8qRP4r0
+
+{
+  "businessId": "69a44fa9f570f62c03091993",
+  "name": "General Consultation",
+  "description": "Doctor check-up and advice",
+  "price": 2000,
+  "duration": 30
+}
+
