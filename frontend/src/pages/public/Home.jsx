@@ -12,7 +12,10 @@ import {
   ChevronRight,
   ChevronLeft,
   ChevronDown,
-  Sparkles,
+  Clock,
+  ShieldCheck,
+  LayoutDashboard,
+  TrendingUp,
   Scissors,
   HeartPulse,
   Landmark,
@@ -22,7 +25,7 @@ import {
 import api from "../../api/axios";
 import Footer from "../../components/Footer";
 
-import aboutHero from "../../assets/about.png";
+import aboutHero from "../../assets/About.jpg";
 import howServices from "../../assets/how_services.png";
 
 import bankingImg from "../../assets/Banking Services.webp";
@@ -593,18 +596,22 @@ const whyCards = [
   {
     title: "Save time",
     text: "Book services instantly without unnecessary calls, confusion, or long waiting.",
+    icon: Clock,
   },
   {
     title: "Build trust",
     text: "Clear reviews and business details help users make confident, informed choices.",
+    icon: ShieldCheck,
   },
   {
     title: "Support businesses",
     text: "Manage appointments, services, and customers all in one efficient platform.",
+    icon: LayoutDashboard,
   },
   {
     title: "Grow faster",
     text: "Reach more clients and scale bookings with tools built for growth.",
+    icon: TrendingUp,
   },
 ];
 
@@ -641,7 +648,7 @@ function WhyChooseUs() {
             className="flex flex-col items-center"
           >
             <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#2563EB] text-[#2563EB] transition hover:bg-[#2563EB] hover:text-white">
-              <Sparkles size={26} />
+              <card.icon size={26} />
             </div>
 
             <h3 className="mt-4 text-[15px] font-semibold text-[#0a1628]">{card.title}</h3>
@@ -753,75 +760,80 @@ function TestimonialsSection() {
           </motion.p>
         </div>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {testimonialsData.map((t, i) => (
-            <motion.button
-              key={t.id}
-              type="button"
-              onClick={() => setActive(i)}
-              variants={fadeUp}
-              className={`group relative rounded-[32px] p-[1px] text-left transition-all duration-500 ${
-                active === i
-                  ? "scale-[1.03] bg-gradient-to-br from-[#0a4abf] via-blue-400 to-cyan-300 shadow-[0_24px_70px_rgba(10,74,191,0.22)]"
-                  : "bg-white/70 hover:-translate-y-2 hover:bg-[#0a4abf]/15"
-              }`}
-            >
-              <div className="relative h-full overflow-hidden rounded-[31px] bg-white p-7">
-                <div className="absolute right-6 top-6 text-7xl font-serif leading-none text-[#0a4abf]/5">
-                  ”
+        {/* Minimal testimonial widget */}
+        <motion.div variants={fadeUp} className="mx-auto mt-16 max-w-xl rounded-3xl bg-white px-8 py-10 shadow-[0_16px_60px_rgba(10,74,191,0.10)]">
+          {/* Animated quote */}
+          <div className="relative min-h-[100px] mb-10">
+            {testimonialsData.map((t, i) => (
+              <p
+                key={t.id}
+                className={`absolute inset-0 text-xl md:text-2xl font-light leading-relaxed text-slate-800 transition-all duration-500 ease-out ${
+                  active === i
+                    ? "opacity-100 translate-y-0 blur-0"
+                    : "opacity-0 translate-y-4 blur-sm pointer-events-none"
+                }`}
+              >
+                "{t.text}"
+              </p>
+            ))}
+          </div>
+
+          {/* Author row */}
+          <div className="flex items-center gap-6">
+            {/* Avatars */}
+            <div className="flex -space-x-2">
+              {testimonialsData.map((t, i) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActive(i)}
+                  className={`relative h-11 w-11 overflow-hidden rounded-full ring-2 ring-white transition-all duration-300 ease-out ${
+                    active === i ? "z-10 scale-110" : "grayscale hover:grayscale-0 hover:scale-105"
+                  }`}
+                >
+                  <img src={t.image} alt={t.name} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <div className="h-8 w-px bg-slate-200" />
+
+            {/* Active author info */}
+            <div className="relative min-h-[44px] flex-1">
+              {testimonialsData.map((t, i) => (
+                <div
+                  key={t.id}
+                  className={`absolute inset-0 flex flex-col justify-center transition-all duration-300 ease-out ${
+                    active === i ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"
+                  }`}
+                >
+                  <span className="text-sm font-semibold text-slate-900">{t.name}</span>
+                  <span className="text-xs text-slate-500">
+                    {t.role}{t.company ? ` · ${t.company}` : ""}
+                  </span>
                 </div>
+              ))}
+            </div>
 
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between gap-4">
-                    <StarRating rating={t.rating} />
+            {/* Star rating */}
+            <div className="shrink-0">
+              <StarRating rating={testimonialsData[active].rating} />
+            </div>
+          </div>
 
-                    <span
-                      className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-                        active === i
-                          ? "bg-[#0a4abf] text-white"
-                          : "bg-slate-100 text-slate-400"
-                      }`}
-                    >
-                      {active === i ? "Featured" : "Review"}
-                    </span>
-                  </div>
-
-                  <p className="mt-6 min-h-[120px] text-sm leading-7 text-slate-600">
-                    “{t.text}”
-                  </p>
-
-                  <div className="mt-7 flex items-center gap-4 border-t border-slate-100 pt-5">
-                    <img
-                      src={t.image}
-                      alt={t.name}
-                      className="h-12 w-12 rounded-2xl object-cover ring-4 ring-[#f0f5ff]"
-                    />
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-950">{t.name}</h4>
-                      <p className="mt-0.5 text-xs text-slate-500">
-                        {t.role}
-                        {t.company ? ` · ${t.company}` : ""}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-
-        <div className="mt-10 flex justify-center gap-2">
-          {testimonialsData.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
-                active === i ? "w-8 bg-[#0a4abf]" : "w-2.5 bg-slate-300 hover:bg-slate-400"
-              }`}
-            />
-          ))}
-        </div>
+          {/* Dot indicators */}
+          <div className="mt-8 flex justify-center gap-2">
+            {testimonialsData.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  active === i ? "w-8 bg-[#0a4abf]" : "w-2 bg-slate-300 hover:bg-slate-400"
+                }`}
+              />
+            ))}
+          </div>
+        </motion.div>
       </motion.div>
     </section>
   );
