@@ -1,32 +1,31 @@
 {
-"navbar": {
-  "home": "Home",
-  "businesses": "Businesses",
-  "login": "Login",
-  "register": "Register",
-  "about": "About Us",
-  "contact": "Contact",
-  "profile": "Profile",
-  "dashboard": "Dashboard",
-  "logout": "Logout"
-},
-
-  
+  "navbar": {
+    "home": "Home",
+    "businesses": "Services",
+    "login": "Login",
+    "register": "Register",
+    "about": "About Us",
+    "contact": "Contact",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
   "login": {
-    "welcome": "Welcome again!",
-    "subtitle": "Please enter your details",
+    "welcome": "Welcome back",
+    "subtitle": "Log in to continue to your account",
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "password": "Password",
     "passwordPlaceholder": "Enter your password",
-    "remember": "Remember Me",
-    "forgot": "Forgot Password?",
+    "remember": "Remember me",
+    "forgot": "Forgot password?",
     "loginButton": "Log In",
     "logging": "Logging in...",
     "noAccount": "Don't have an account?",
     "register": "Register",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
+    "google": "Continue with Google",
     "hero": {
       "line1": "The rare ones don't wait.",
       "line2": "Plan wisely with NOBTY"
@@ -36,19 +35,38 @@
       "failed": "Login failed."
     }
   },
+  "forgotPassword": {
+    "badge": "Secure recovery",
+    "title": "Forgot password?",
+    "subtitle": "Enter your email and we will send you a secure link to reset your password.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send reset link",
+    "submitting": "Sending link...",
+    "backToLogin": "Back to login",
+    "footer": "For security reasons, the reset link may expire shortly.",
+    "success": "Reset link sent successfully. Please check your inbox.",
+    "errorEmpty": "Please enter your email address.",
+    "errorInvalid": "Please enter a valid email address.",
+    "errorFallback": "Something went wrong. Please try again."
+  },
   "register": {
-    "brand": "Nobty",
+    "brand": "NOBTY",
     "title": "Create your account",
     "subtitle": "Register as a customer or a business owner.",
-    "accountType": "Account Type",
+    "accountType": "Account type",
+    "fullName": "Full name",
     "email": "Email",
-    "phone": "Phone Number",
+    "phone": "Phone number",
     "password": "Password",
-    "confirmPassword": "Confirm Password",
+    "confirmPassword": "Confirm password",
     "submit": "Register",
     "creating": "Creating account...",
     "hasAccount": "Already have an account?",
     "login": "Login",
+    "close": "Close",
+    "google": "Continue with Google",
+    "joinTitle": "Join NOBTY as a customer or business owner",
     "success": "Account created successfully.",
     "error": "Registration failed.",
     "roles": {
@@ -56,6 +74,7 @@
       "businessOwner": "Business Owner"
     },
     "placeholders": {
+      "fullName": "Enter your full name",
       "email": "Enter your email",
       "phone": "+212XXXXXXXXX",
       "password": "Create a password",
@@ -72,8 +91,8 @@
       "businessRequired": "Business name, category, and city are required for business owners."
     },
     "businessInfo": {
-      "title": "Business Information",
-      "businessName": "Business Name",
+      "title": "Business information",
+      "businessName": "Business name",
       "category": "Category",
       "city": "City",
       "address": "Address",
@@ -100,61 +119,426 @@
     "panel": {
       "customer": {
         "badge": "Customer",
-        "title": "Smarter appointments start here",
+        "title": "Smart appointments start here",
         "description": "Discover services, explore businesses, and book your appointments easily in just a few clicks.",
         "pill1": "Fast booking",
         "pill2": "Save time"
       },
       "business": {
         "badge": "Business",
-        "title": "Grow your business with Nobty",
+        "title": "Grow your business with NOBTY",
         "description": "Create your business profile, get discovered by more customers, and manage appointments with ease.",
         "pill1": "More visibility",
         "pill2": "Better scheduling"
       }
     }
   },
-
- "contact": {
-  "hero": {
-    "title": "Contact Us",
-    "subtitle": "We're here to help you manage appointments smarter with Nobty",
-    "quote": "Your time matters. Nobty helps you book smarter and wait less."
+  "home": {
+    "hero": {
+      "simplifying": "Simplifying",
+      "headline": "We simplify the way services are booked.",
+      "subtitle": "NOBTY helps people find trusted businesses, compare services, and book appointments with less effort and more confidence.",
+      "searchPlaceholder": "Search for a service",
+      "searchButton": "Search",
+      "selectCity": "Select city",
+      "selectCategory": "Select category"
+    },
+    "logoCloud": "Trusted by leading companies in Morocco",
+    "categories": {
+      "label": "Discover possibilities",
+      "title": "Explore services",
+      "titleHighlight": "without limits",
+      "subtitle": "From beauty to banking, find the perfect service for your needs in seconds.",
+      "viewAll": "View all services"
+    },
+    "explore": {
+      "label": "Smart discovery",
+      "title": "Find trusted businesses",
+      "titleHighlight": "near you",
+      "subtitle": "Browse, compare, and book services from verified providers with ease.",
+      "browseAll": "Browse all businesses",
+      "noBusinesses": "No businesses found."
+    },
+    "why": {
+      "title": "Why NOBTY stands out",
+      "subtitle": "Designed to simplify life for users and empower businesses.",
+      "cards": {
+        "saveTime": {
+          "title": "Save time",
+          "text": "Book services instantly without unnecessary calls, confusion, or long waiting times."
+        },
+        "buildTrust": {
+          "title": "Build trust",
+          "text": "Clear ratings and business details help users make confident, informed choices."
+        },
+        "supportBusinesses": {
+          "title": "Support businesses",
+          "text": "Manage appointments, services, and customers in one efficient platform."
+        },
+        "growFaster": {
+          "title": "Grow faster",
+          "text": "Reach more customers and improve your bookings with tools designed for growth."
+        }
+      }
+    },
+    "testimonials": {
+      "label": "Real experiences",
+      "title": "What people love",
+      "titleHighlight": "about us",
+      "subtitle": "Trusted by customers and businesses across Morocco for faster bookings and smoother service."
+    },
+    "believe": {
+      "label": "Get started",
+      "title": "Your time deserves",
+      "titleHighlight": "a smarter way to book",
+      "subtitle": "NOBTY is built to help users make faster decisions, book with clarity, and spend their time on what truly matters.",
+      "quote": "We believe time should be invested, not wasted waiting.",
+      "appointments": "Appointments",
+      "providers": "Providers",
+      "cities": "Cities",
+      "exploreMore": "Explore more",
+      "joinUs": "Join us"
+    }
   },
-
-  "left": {
-    "title": "Get in touch",
-    "subtitle": "Whether you are a customer looking for support or a business wanting to join Nobty, our team is here for you.",
-    "careTitle": "We care about our customers",
-    "careText": "Every message matters to us. We aim to respond quickly, clearly, and with care.",
-    "officeTitle": "Head Office",
-    "officeLine1": "Casablanca, Morocco",
-    "officeLine2": "Nobty Headquarters",
-    "emailTitle": "Email Us",
-    "phoneTitle": "Call Us",
-    "phoneLine1": "Phone: +212 600 000 000",
-    "phoneLine2": "Office: +212 522 000 000"
+  "about": {
+    "hero": {
+      "headline": "Booking became",
+      "rotatingWords": [
+        "faster",
+        "smarter",
+        "simpler",
+        "easier",
+        "better"
+      ],
+      "headlineEnd": "for everyone.",
+      "description": "NOBTY is a modern booking platform designed to make appointment scheduling easier, faster, and more organized for both customers and service providers.",
+      "description2": "We help users discover trusted businesses, compare services, and book appointments online with full confidence.",
+      "exploreBusinesses": "Explore businesses",
+      "createAccount": "Create account",
+      "stats": {
+        "appointments": "appointments booked",
+        "businesses": "businesses listed",
+        "cities": "cities in Morocco"
+      },
+      "badge": {
+        "appointmentBooked": "Appointment booked",
+        "justNow": "Just now · Casablanca",
+        "businesses": "+70 businesses",
+        "acrossMorocco": "Across Morocco"
+      }
+    },
+    "intro": {
+      "label": "Why we exist",
+      "title": "A real problem. A real solution.",
+      "subtitle": "We noticed a gap between how services are offered and how people actually book them. NOBTY was built to close that gap.",
+      "problem": {
+        "badge": "The problem",
+        "title": "The obstacles we noticed",
+        "text": "Booking a service is still difficult for many customers. People often waste time searching, calling to check availability, and waiting without clear information.",
+        "items": [
+          "No central place to discover services",
+          "Phone calls just to check availability",
+          "Unclear prices and waiting times"
+        ]
+      },
+      "solution": {
+        "badge": "The solution",
+        "title": "What we built",
+        "text": "NOBTY brings businesses and customers into one simple platform. Users can explore services, check business information, book appointments, and manage their time.",
+        "items": [
+          "Browse and compare businesses in seconds",
+          "Book appointments with one click",
+          "Businesses manage everything in one place"
+        ]
+      }
+    },
+    "vision": {
+      "label": "Our vision",
+      "title": "Building a smarter way to connect services with people.",
+      "text1": "Our vision is to become a trusted digital booking platform that connects people with reliable service providers across Morocco.",
+      "text2": "We aim to create a smoother experience where finding, comparing, and booking services becomes simple, transparent, and accessible to everyone.",
+      "badge": {
+        "growing": "Fast growing",
+        "cities": "3 cities and more coming"
+      },
+      "pillars": {
+        "transparency": {
+          "title": "Transparency",
+          "text": "Clear information before every booking"
+        },
+        "simplicity": {
+          "title": "Simplicity",
+          "text": "One platform, no complexity"
+        },
+        "growth": {
+          "title": "Growth",
+          "text": "Expanding city by city"
+        },
+        "community": {
+          "title": "Community",
+          "text": "Built for people in Morocco"
+        }
+      }
+    },
+    "map": {
+      "label": "Where we operate",
+      "title": "Expanding across Morocco",
+      "subtitle": "NOBTY currently operates in Casablanca, Rabat, and Tangier — with more cities coming soon.",
+      "cities": {
+        "casablanca": "A major business and service hub for NOBTY.",
+        "rabat": "Supporting organized appointments in the capital.",
+        "tangier": "Expanding booking access in northern Morocco."
+      }
+    },
+    "mission": {
+      "label": "Our mission",
+      "title": "Reduce waiting times and simplify appointments.",
+      "subtitle": "Three core principles guide everything we build at NOBTY.",
+      "items": {
+        "saveTime": {
+          "title": "Save time",
+          "text": "Helping customers book services without unnecessary calls, confusion, or long waiting times."
+        },
+        "buildTrust": {
+          "title": "Build trust",
+          "text": "Giving users clear business details, ratings, and service information before booking."
+        },
+        "supportBusinesses": {
+          "title": "Support businesses",
+          "text": "Helping service providers manage appointments, availability, and customers professionally."
+        }
+      }
+    },
+    "cta": {
+      "label": "Start today",
+      "title": "Ready to book smarter?",
+      "subtitle": "Join thousands of users and businesses already saving time with NOBTY.",
+      "startBooking": "Start booking",
+      "smarter": "smarter",
+      "with": "with",
+      "text": "Discover trusted businesses, explore available services, and book your next appointment through a platform built around time, trust, and convenience.",
+      "exploreBusinesses": "Explore businesses",
+      "createAccount": "Create account",
+      "beliefBadge": "Our belief",
+      "beliefQuote": "“We believe time should be invested, not wasted waiting.”",
+      "beliefText": "NOBTY helps users make faster decisions, book with clarity, and spend their time on what truly matters.",
+      "stats": {
+        "businesses": "Businesses",
+        "appointments": "Appointments"
+      }
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Questions about NOBTY?",
+      "subtitle": "Here are the key answers about how NOBTY helps users and service providers.",
+      "items": [
+        {
+          "question": "What is NOBTY?",
+          "answer": "NOBTY is a booking platform that helps customers discover businesses, compare services, and book appointments online."
+        },
+        {
+          "question": "Who can use NOBTY?",
+          "answer": "NOBTY is designed for customers who want to book services and businesses that want to manage appointments more professionally."
+        },
+        {
+          "question": "Can businesses manage their services on NOBTY?",
+          "answer": "Yes. Providers can manage their profile, services, availability, bookings, and customer interactions from the dashboard."
+        },
+        {
+          "question": "Which cities does NOBTY focus on?",
+          "answer": "NOBTY currently focuses on Casablanca, Rabat, and Tangier, with plans to expand to more Moroccan cities."
+        }
+      ]
+    }
   },
-
-  "form": {
-    "title": "Send us a message",
-    "contactAs": "I am contacting Nobty as:",
-    "customer": "Customer",
+  "businesses": {
+    "label": "Explore businesses",
+    "title": "Find the best and book",
+    "subtitle": "Choose a city, browse by category, or search by name.",
+    "trustedBy": "Trusted by leading companies in Morocco",
+    "searchPlaceholder": "Search by name or address",
+    "chooseCity": "Choose city",
+    "allCategories": "All categories",
+    "sortBy": "Sort by",
+    "city": "City",
+    "category": "Category",
+    "rating": "Rating",
+    "staff": "Staff",
+    "wait": "Wait",
+    "address": "Address",
+    "search": "Search",
+    "quickBook": "Quick book",
+    "viewDetails": "View details",
+    "noBusinesses": "No businesses found",
+    "tryAdjusting": "Try adjusting your filters or search term",
+    "selectCityFirst": "Select a city to start",
+    "selectCityHint": "Choose a city from the search form above"
+  },
+  "businessDetails": {
+    "verified": "Verified",
+    "trustedChoice": "Trusted choice",
+    "rating": "Rating",
+    "ratings": "ratings",
+    "capacity": "Capacity",
+    "interval": "Interval",
+    "minutesPerSlot": "minutes per slot",
+    "queueSpots": "queue spots available",
+    "availableNow": "Available now",
+    "cleanClearBookable": "Clean, clear, bookable",
+    "services": "Services",
+    "noServices": "No services available.",
+    "bookThisService": "Book this service",
+    "readyToBook": "Ready to book",
+    "reviews": "Customer reviews",
+    "latestFeedback": "Latest feedback",
+    "reviewSummary": "Review summary",
+    "basedOnReviews": "Based on real reviews",
+    "loadingReviews": "Loading reviews...",
+    "toggleFavorite": "Toggle favorite"
+  },
+  "book": {
+    "back": "Back",
+    "bookingProgress": "Booking progress",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "step": "Step",
+    "of": "/",
+    "steps": {
+      "service": "Service",
+      "dateTime": "Date & time",
+      "confirmation": "Confirmation"
+    },
+    "verifiedService": "Verified service",
     "business": "Business",
-    "name": "Name",
-    "email": "Email",
-    "subject": "Subject",
-    "businessSubject": "Business subject",
-    "message": "Write your message...",
-    "businessMessage": "Tell us about your business request...",
-    "send": "Send",
-    "sending": "Sending..."
+    "price": "Price",
+    "duration": "Duration",
+    "chooseDate": "Choose a date",
+    "orChooseDate": "Or choose another date",
+    "chooseTime": "Choose a time",
+    "orEnterTime": "Or enter another time",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional note for the business...",
+    "confirmBooking": "Confirm booking",
+    "confirming": "Confirming...",
+    "reservationSummary": "Booking summary",
+    "selectedService": "Selected service",
+    "selectedDate": "Selected date",
+    "selectedTime": "Selected time",
+    "afterConfirmation": "After confirmation, your appointment details and QR code will appear on the success screen.",
+    "success": {
+      "title": "Your booking is confirmed",
+      "subtitle": "Your booking was created successfully. Keep this page and use the QR code if verification is required.",
+      "service": "Service",
+      "business": "Business",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "bookingId": "Booking ID",
+      "qrTitle": "QR code for check-in",
+      "qrSubtitle": "This QR code contains your appointment information for quick verification.",
+      "qrCaption": "Show this QR code at the business if they use appointment verification.",
+      "viewAppointments": "View my appointments",
+      "continueBrowsing": "Continue browsing"
+    },
+    "loading": "Loading booking page...",
+    "serviceNotFound": "Service not found.",
+    "errors": {
+      "chooseDateAndTime": "Please choose both date and time.",
+      "missingServiceId": "Service ID is missing.",
+      "missingBusiness": "Business information is missing for this service.",
+      "missingUser": "User information is missing. Please log in again.",
+      "failedToCreate": "Failed to create appointment."
+    }
   },
-
-  "validation": {
-    "required": "Please fill in all fields.",
-    "success": "Message sent successfully!",
-    "failed": "Failed to send message."
+  "createBusiness": {
+    "badge": "Business setup",
+    "title": "Complete your business profile",
+    "subtitle": "Make your profile trusted and professional",
+    "secondStep": "This is the second step after account creation.",
+    "mainPhoto": {
+      "label": "Upload main photo",
+      "hint": "Cover image for your business",
+      "preview": "Main photo preview",
+      "noImage": "No main image selected"
+    },
+    "galleryPhotos": {
+      "label": "Upload gallery photos",
+      "hint": "Choose multiple images",
+      "preview": "Gallery preview",
+      "noImages": "No gallery images selected"
+    },
+    "businessName": "Business name",
+    "businessNamePlaceholder": "Enter business name",
+    "phone": "Phone",
+    "category": "Category",
+    "city": "City",
+    "address": "Address",
+    "addressPlaceholder": "Enter address",
+    "description": "Description",
+    "descriptionPlaceholder": "Tell customers about your business",
+    "schedule": "Weekly schedule",
+    "openThisDay": "Open this day",
+    "submit": "Complete setup",
+    "submitting": "Saving...",
+    "visualAlt": "Business setup visual"
+  },
+  "contact": {
+    "hero": {
+      "title": "Contact Us",
+      "subtitle": "We're here to help you manage appointments smarter with NOBTY",
+      "quote": "Your time matters. NOBTY helps you book smarter and wait less."
+    },
+    "left": {
+      "title": "Get in touch",
+      "subtitle": "Whether you are a customer looking for support or a business wanting to join NOBTY, our team is here for you.",
+      "careTitle": "We care about our customers",
+      "careText": "Every message matters to us. We aim to respond quickly, clearly, and with care.",
+      "officeTitle": "Head Office",
+      "officeLine1": "Casablanca, Morocco",
+      "officeLine2": "NOBTY Headquarters",
+      "emailTitle": "Email us",
+      "phoneTitle": "Call us",
+      "phoneLine1": "Phone: +212 600 000 000",
+      "phoneLine2": "Office: +212 522 000 000",
+      "findUs": "Find us",
+      "ourOffices": "Our offices across Morocco"
+    },
+    "form": {
+      "title": "Send us a message",
+      "weRespond": "We will respond within 2 hours.",
+      "contactAs": "I am contacting NOBTY as:",
+      "customer": "Customer",
+      "business": "Business",
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "businessSubject": "Business subject",
+      "message": "Write your message...",
+      "businessMessage": "Tell us about your business request...",
+      "send": "Send",
+      "sending": "Sending..."
+    },
+    "validation": {
+      "required": "Please fill in all fields.",
+      "success": "Message sent successfully!",
+      "failed": "Failed to send message."
+    }
+  },
+  "footer": {
+    "brandText": "Smart appointment booking for customers and businesses.",
+    "company": "Company",
+    "home": "Home",
+    "businesses": "Businesses",
+    "about": "About Us",
+    "contact": "Contact",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "myAccount": "My Account",
+    "contactSupport": "Contact support",
+    "newsletter": "Newsletter",
+    "newsletterText": "Get the latest NOBTY news and updates directly in your inbox.",
+    "email": "Email",
+    "signUp": "Sign up",
+    "rights": "All rights reserved."
   }
-}
 }
