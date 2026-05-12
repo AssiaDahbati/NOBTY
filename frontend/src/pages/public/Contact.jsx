@@ -28,8 +28,7 @@ const CITIES = [
   { city: "Casablanca", address: "Boulevard Mohammed V", phone: "+212 522 000 000", emoji: "🏙️" },
   { city: "Rabat", address: "Avenue Hassan II", phone: "+212 537 000 000", emoji: "🏛️" },
   { city: "Tangier", address: "Boulevard Mohammed VI", phone: "+212 539 000 000", emoji: "⚓" },
-  { city: "Marrakech", address: "Avenue de la Ménara", phone: "+212 524 000 000", emoji: "🌴" },
-  { city: "Fes", address: "Avenue Allal Al Fassi", phone: "+212 535 000 000", emoji: "🕌" },
+  
 ];
 
 // Map embed URLs for each city
@@ -37,8 +36,7 @@ const MAP_EMBEDS = {
   Casablanca: "https://maps.google.com/maps?q=casablanca+morocco&t=&z=13&ie=UTF8&iwloc=&output=embed",
   Rabat: "https://maps.google.com/maps?q=rabat+morocco&t=&z=13&ie=UTF8&iwloc=&output=embed",
   Tangier: "https://maps.google.com/maps?q=tangier+morocco&t=&z=13&ie=UTF8&iwloc=&output=embed",
-  Marrakech: "https://maps.google.com/maps?q=marrakech+morocco&t=&z=13&ie=UTF8&iwloc=&output=embed",
-  Fes: "https://maps.google.com/maps?q=fes+morocco&t=&z=13&ie=UTF8&iwloc=&output=embed",
+  
 };
 
 export default function Contact() {

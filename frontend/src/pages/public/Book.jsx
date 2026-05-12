@@ -1,899 +1,877 @@
+/**
+ * Book.jsx — Premium Service Booking
+ * Palette  : Navy #1a2e6e · Warm white #FAFAF8 · Amber #D4962A · Slate text
+ * Layout   : Full-height split panel (left = service hero, right = form)
+ * Font     : "Plus Jakarta Sans" body, no extra imports needed via Tailwind
+ * Motion   : framer-motion spring animations throughout
+ */
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import QRCode from "react-qr-code";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  CalendarDays,
-  Clock3,
-  CheckCircle2,
   ArrowLeft,
-  Sparkles,
-  Building2,
-  BadgeDollarSign,
-  TimerReset,
-  ShieldCheck,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
   NotebookPen,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+  RotateCcw,
+  Check,
+  Building2,
+  MapPin,
+  Timer,
+  Banknote,
+  Star,
+  CalendarDays,
 } from "lucide-react";
 import api from "../../api/axios";
 
-const FALLBACK_SERVICE_IMAGE =
-  "https://via.placeholder.com/1200x700?text=Service+Image";
+/* ─── palette tokens ─── */
+const C = {
+  navy:   "#1a2e6e",
+  navyD:  "#111e4a",
+  amber:  "#D4962A",
+  amberL: "#FDF3DC",
+  canvas: "#FAFAF8",
+  panel:  "#F3F4F8",
+  border: "#E4E7F0",
+  muted:  "#8892AA",
+  text:   "#1C2337",
+};
 
-const TIME_OPTIONS = [
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
+/* ─── constants ─── */
+const FALLBACK_IMG =
+  "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=900&q=80";
+
+const SLOTS = [
+  "09:00","09:30","10:00","10:30","11:00","11:30",
+  "12:00","12:30","13:00","13:30","14:00","14:30",
+  "15:00","15:30","16:00","16:30","17:00","17:30",
 ];
 
-function formatDisplayDate(value) {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString();
+/* ─── helpers ─── */
+const toYMD = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+const todayYMD = toYMD(new Date());
+
+function fmtDate(v) {
+  if (!v) return "—";
+  const d = new Date(v);
+  if (isNaN(d)) return v;
+  return d.toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 }
 
-function formatDisplayTime(value) {
-  if (!value) return "-";
-  return value;
+function fmtShort(v) {
+  if (!v) return "";
+  const d = new Date(v);
+  return d.toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short" });
 }
 
-function formatPriceMAD(price) {
-  return `${Number(price || 0)} MAD`;
-}
+function fmtPrice(p) { return `${Number(p||0).toLocaleString()} MAD`; }
 
-function formatDateChipLabel(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return date.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
+function getWeek(anchor) {
+  const base = new Date(anchor);
+  const dow = base.getDay();
+  base.setDate(base.getDate() - (dow === 0 ? 6 : dow - 1));
+  return Array.from({length:6}, (_,i) => {
+    const d = new Date(base); d.setDate(base.getDate()+i); return d;
   });
 }
 
-function getNextDays(count = 10) {
-  const days = [];
+/* ─── micro components ─── */
 
-  for (let i = 0; i < count; i += 1) {
-    const date = new Date();
-    date.setDate(date.getDate() + i);
-
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-
-    days.push({
-      value: `${yyyy}-${mm}-${dd}`,
-      label: formatDateChipLabel(date),
-    });
-  }
-
-  return days;
+function NavyDot() {
+  return <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#D4962A]" />;
 }
 
+/** Horizontal step strip */
+function Steps({ step }) {
+  const labels = ["Service Info", "Pick a Slot", "Confirmed"];
+  return (
+    <div
+      style={{ background: C.canvas, borderBottom: `1px solid ${C.border}` }}
+      className="flex items-center justify-center gap-0 px-6 py-3.5"
+    >
+      {labels.map((label, i) => {
+        const n = i + 1;
+        const done = step > n;
+        const active = step === n;
+        return (
+          <div key={label} className="flex items-center">
+            <div className="flex items-center gap-2">
+              <div
+                style={{
+                  background: done ? "#16a34a" : active ? C.navy : C.border,
+                  color: done || active ? "#fff" : C.muted,
+                  boxShadow: active ? `0 0 0 4px ${C.navy}18` : "none",
+                }}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300"
+              >
+                {done ? <Check size={11} /> : n}
+              </div>
+              <span
+                style={{ color: active ? C.navy : done ? "#16a34a" : C.muted }}
+                className="hidden text-[13px] font-semibold sm:block"
+              >
+                {label}
+              </span>
+            </div>
+            {i < labels.length - 1 && (
+              <div
+                style={{ background: C.border }}
+                className="mx-4 hidden h-px w-8 overflow-hidden sm:block"
+              >
+                <motion.div
+                  animate={{ width: done ? "100%" : "0%" }}
+                  transition={{ duration: 0.5 }}
+                  style={{ background: C.navy }}
+                  className="h-full"
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Animated week calendar */
+function WeekPicker({ value, onChange }) {
+  const [anchor, setAnchor] = useState(new Date());
+  const week = getWeek(anchor);
+  const month = anchor.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
+  const shift = (dir) => {
+    const d = new Date(anchor);
+    d.setDate(d.getDate() + dir * 7);
+    setAnchor(d);
+  };
+
+  return (
+    <div
+      style={{ background: C.panel, border: `1px solid ${C.border}` }}
+      className="rounded-2xl p-4"
+    >
+      {/* header */}
+      <div className="mb-4 flex items-center justify-between">
+        <p style={{ color: C.text }} className="text-sm font-bold capitalize">{month}</p>
+        <div className="flex gap-1">
+          {[-1, 1].map((dir) => (
+            <button
+              key={dir}
+              type="button"
+              onClick={() => shift(dir)}
+              style={{ color: C.muted }}
+              className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white hover:shadow-sm"
+            >
+              {dir === -1 ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* grid */}
+      <div className="grid grid-cols-6 gap-2">
+        {week.map((day) => {
+          const ymd = toYMD(day);
+          const sel = value === ymd;
+          const past = ymd < todayYMD;
+          const isToday = ymd === todayYMD;
+
+          return (
+            <div key={ymd} className="flex flex-col items-center gap-1.5">
+              <span
+                style={{ color: C.muted }}
+                className="text-[10px] font-semibold uppercase tracking-wider"
+              >
+                {day.toLocaleDateString("en-GB", { weekday: "short" }).slice(0, 2)}
+              </span>
+              <button
+                type="button"
+                disabled={past}
+                onClick={() => onChange(ymd)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30"
+                style={{ color: sel ? "#fff" : past ? C.muted : C.text }}
+              >
+                <AnimatePresence>
+                  {sel && (
+                    <motion.div
+                      layoutId="day-bg"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ background: C.navy }}
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </AnimatePresence>
+                <span className="relative z-10">{day.getDate()}</span>
+                {isToday && !sel && (
+                  <span
+                    className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full"
+                    style={{ background: C.amber }}
+                  />
+                )}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Real-data-only star rating */
+function Rating({ rating, count }) {
+  if (!rating || !count) return null;
+  return (
+    <div
+      style={{ background: C.amberL, color: C.amber }}
+      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold"
+    >
+      <Star size={12} className="fill-current" />
+      {Number(rating).toFixed(1)}
+      <span style={{ color: "#B8882A" }} className="font-normal">({count})</span>
+    </div>
+  );
+}
+
+/** Skeleton shimmer */
+function Skeleton() {
+  return (
+    <div style={{ background: C.canvas }} className="min-h-screen animate-pulse">
+      <div className="h-14 bg-white shadow-sm" />
+      <div className="mx-auto max-w-6xl px-4 py-10 space-y-6">
+        <div style={{ background: C.panel }} className="h-10 w-28 rounded-xl" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div style={{ background: C.panel }} className="h-96 rounded-3xl" />
+          <div className="space-y-4">
+            <div style={{ background: C.panel }} className="h-48 rounded-3xl" />
+            <div style={{ background: C.panel }} className="h-40 rounded-3xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────── */
 export default function Book() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
 
-  const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [service, setService]       = useState(null);
+  const [loading, setLoading]       = useState(true);
   const [submitting, setSubmitting] = useState(false);
-
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [notes, setNotes] = useState("");
-
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
+  const [date, setDate]             = useState("");
+  const [time, setTime]             = useState("");
+  const [notes, setNotes]           = useState("");
+  const [error, setError]           = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [appointment, setAppointment] = useState(null);
+  const [appointment, setAppointment]       = useState(null);
 
   useEffect(() => {
-    const fetchService = async () => {
+    if (!serviceId) return;
+    (async () => {
       try {
         setLoading(true);
-        setError("");
-
         const res = await api.get(`/services/${serviceId}`);
         setService(res.data);
-      } catch (err) {
-        console.error("Failed to fetch service:", err);
+      } catch {
         setError("Failed to load service details.");
       } finally {
         setLoading(false);
       }
-    };
-
-    if (serviceId) {
-      fetchService();
-    }
+    })();
   }, [serviceId]);
 
-  const minDate = useMemo(() => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  }, []);
+  const svc = useMemo(() => ({
+    price:       service?.price        ?? 0,
+    duration:    service?.duration     ?? 0,
+    name:        service?.name         ?? "—",
+    business:    service?.business?.businessName || service?.business?.name || "Business",
+    businessId:  service?.business?._id || "",
+    img:         service?.image        || FALLBACK_IMG,
+    desc:        service?.description  || "No description available.",
+    rating:      service?.rating       ?? null,
+    reviews:     service?.reviewCount  ?? null,
+    city:        service?.business?.city || service?.city || null,
+  }), [service]);
 
-  const nextDays = useMemo(() => getNextDays(10), []);
-
-  const summary = useMemo(() => {
-    return {
-      price: service?.price ?? 0,
-      duration: service?.duration ?? 0,
-      serviceName: service?.name ?? "-",
-      businessName:
-        service?.business?.businessName ||
-        service?.business?.name ||
-        "Business",
-      businessId: service?.business?._id || "",
-      serviceImage: service?.image || FALLBACK_SERVICE_IMAGE,
-      description: service?.description || "No description available.",
-    };
-  }, [service]);
-
-  const currentStep = useMemo(() => {
+  const step = useMemo(() => {
     if (bookingSuccess) return 3;
     if (date && time) return 2;
     return 1;
   }, [bookingSuccess, date, time]);
 
-  const progressWidth = currentStep === 1 ? "33.333%" : currentStep === 2 ? "66.666%" : "100%";
-
-  const handleSubmit = async (e) => {
+  const handleBook = async (e) => {
     e.preventDefault();
-
     setError("");
-    setSuccessMessage("");
+    if (!date || !time)          { setError("Please select both a date and a time."); return; }
+    if (!serviceId)              { setError("Missing service ID."); return; }
+    if (!svc.businessId)         { setError("Missing business information."); return; }
 
-    if (!date || !time) {
-      setError("Please choose both date and time.");
-      return;
-    }
+    const token = localStorage.getItem("token");
+    const safeParse = (v) => { try { return v ? JSON.parse(v) : null; } catch { return null; } };
+    const stored =
+      safeParse(localStorage.getItem("user")) ||
+      safeParse(localStorage.getItem("authUser")) ||
+      safeParse(localStorage.getItem("client")) ||
+      safeParse(localStorage.getItem("currentUser"));
+    const userId =
+      localStorage.getItem("userId") || stored?._id || stored?.id || stored?.userId;
 
-    if (!serviceId) {
-      setError("Service ID is missing.");
-      return;
-    }
-
-    if (!summary.businessId) {
-      setError("Business information is missing for this service.");
-      return;
-    }
+    if (!token || !userId) { setError("Session expired. Please log in again."); return; }
 
     try {
       setSubmitting(true);
-
-      const token = localStorage.getItem("token");
-
-      const safeParse = (value) => {
-        try {
-          return value ? JSON.parse(value) : null;
-        } catch {
-          return null;
-        }
-      };
-
-      const storedUser =
-        safeParse(localStorage.getItem("user")) ||
-        safeParse(localStorage.getItem("authUser")) ||
-        safeParse(localStorage.getItem("client")) ||
-        safeParse(localStorage.getItem("currentUser"));
-
-      const userId =
-        localStorage.getItem("userId") ||
-        storedUser?._id ||
-        storedUser?.id ||
-        storedUser?.userId;
-
-      if (!token || !userId) {
-        setError("User information is missing. Please log in again.");
-        return;
-      }
-
-      const payload = {
-        userId,
-        businessId: summary.businessId,
-        serviceId,
-        date,
-        time,
-        notes: notes.trim(),
-      };
-
-      const res = await api.post("/appointments", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const createdAppointment = res.data?.data || res.data;
-
+      const res = await api.post(
+        "/appointments",
+        { userId, businessId: svc.businessId, serviceId, date, time, notes: notes.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const created = res.data?.data || res.data;
       setAppointment({
-        ...createdAppointment,
-        service: createdAppointment?.service || service,
-        date: createdAppointment?.date || date,
-        time: createdAppointment?.time || time,
-        notes: createdAppointment?.notes || notes.trim(),
+        ...created,
+        service: created?.service || service,
+        date:    created?.date    || date,
+        time:    created?.time    || time,
+        notes:   created?.notes   || notes.trim(),
       });
-
       setBookingSuccess(true);
-      setSuccessMessage("Appointment booked successfully.");
     } catch (err) {
-      console.error("Booking error:", err);
       setError(err.response?.data?.message || "Failed to create appointment.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,#eef4ff_0%,#f8fbff_40%,#f6f8fc_100%)] px-4 py-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-[28px] border border-[#e8eef8] bg-white p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-            <p className="text-slate-500">Loading booking page...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  /* ── States ── */
+  if (loading) return <Skeleton />;
 
   if (error && !service && !bookingSuccess) {
     return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,#eef4ff_0%,#f8fbff_40%,#f6f8fc_100%)] px-4 py-10">
-        <div className="mx-auto max-w-3xl rounded-[28px] border border-red-200 bg-red-50 p-8 shadow-sm">
-          <p className="text-red-600">{error}</p>
+      <div style={{ background: C.canvas }} className="flex min-h-screen items-center justify-center px-4">
+        <div style={{ background:"#fff", border:`1px solid ${C.border}` }} className="w-full max-w-sm rounded-3xl p-8 text-center shadow-lg">
+          <div style={{ background:"#FEF2F2" }} className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl">⚠️</div>
+          <h2 style={{ color: C.text }} className="text-lg font-bold">Something went wrong</h2>
+          <p style={{ color: C.muted }} className="mt-2 text-sm">{error}</p>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ background: C.navy }}
+            className="mt-5 w-full rounded-2xl py-3 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Go Back
+          </button>
         </div>
       </div>
     );
   }
 
-  if (!service && !bookingSuccess) {
-    return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,#eef4ff_0%,#f8fbff_40%,#f6f8fc_100%)] px-4 py-10">
-        <div className="mx-auto max-w-3xl rounded-[28px] border border-[#e8eef8] bg-white p-8 shadow-sm">
-          <p className="text-slate-600">Service not found.</p>
-        </div>
-      </div>
-    );
-  }
-
+  /* ════════════════════════════════════════
+     CONFIRMATION
+  ════════════════════════════════════════ */
   if (bookingSuccess && appointment) {
     return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,#eef4ff_0%,#f8fbff_40%,#f6f8fc_100%)] px-4 py-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-            >
-              <ArrowLeft size={16} />
-              Back
-            </button>
-          </div>
+      <div style={{ background: C.canvas }} className="min-h-screen">
+        <Steps step={3} />
 
-          <div className="mb-6 rounded-[28px] border border-[#e8eef8] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-700">
-                  Booking progress
-                </span>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
-                  Completed
-                </span>
+        <div className="mx-auto max-w-5xl px-4 py-8">
+          <button
+            onClick={() => navigate(-1)}
+            style={{ color: C.navy, border: `1px solid ${C.border}`, background: "#fff" }}
+            className="mb-6 inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold shadow-sm transition hover:bg-slate-50"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+
+          {/* Confirmation banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            style={{ background: C.navy }}
+            className="mb-6 overflow-hidden rounded-3xl p-7 text-white shadow-2xl"
+          >
+            <div className="flex flex-wrap items-center gap-5">
+              <div style={{ background: "rgba(255,255,255,0.12)" }} className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ring-1 ring-white/20">
+                <CheckCircle2 size={26} />
               </div>
-              <span className="text-sm font-semibold text-slate-400">Step 3/3</span>
-            </div>
-
-            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,#132249_0%,#1f57d2_55%,#16a34a_100%)] transition-all duration-700 ease-out"
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-4 md:gap-7">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#132249] text-sm font-bold text-white shadow-sm">
-                  1
-                </div>
-                <span className="text-sm font-semibold text-slate-700">
-                  Service
-                </span>
-              </div>
-
-              <div className="hidden h-px w-12 bg-slate-300 md:block" />
-
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#132249] text-sm font-bold text-white shadow-sm">
-                  2
-                </div>
-                <span className="text-sm font-semibold text-slate-700">
-                  Date & Time
-                </span>
-              </div>
-
-              <div className="hidden h-px w-12 bg-slate-300 md:block" />
-
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white shadow-sm">
-                  3
-                </div>
-                <span className="text-sm font-semibold text-emerald-600">
-                  Confirmation
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-[1.35fr_0.95fr]">
-            <div className="rounded-[30px] border border-[#e8eef8] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] md:p-8">
-              <div className="mb-6 rounded-[24px] border border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50 p-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-sm">
-                    <CheckCircle2 size={28} />
-                  </div>
-
-                  <div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                      Your booking is confirmed
-                    </h2>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">
-                      Your reservation was created successfully. Keep this page
-                      saved and use the QR code if verification is needed.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5 md:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Service
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {appointment.service?.name || summary.serviceName}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Business
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {appointment.business?.businessName ||
-                      appointment.service?.business?.businessName ||
-                      appointment.service?.business?.name ||
-                      summary.businessName}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Date
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {formatDisplayDate(appointment.date)}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Time
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {formatDisplayTime(appointment.time)}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Status
-                  </p>
-                  <p className="mt-2 text-base font-bold capitalize text-emerald-600">
-                    {appointment.status || "pending"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Booking ID
-                  </p>
-                  <p className="mt-2 break-all text-base font-bold text-slate-900">
-                    {appointment._id}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-[24px] border border-slate-200 bg-white p-6">
+              <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={18} className="text-[#132249]" />
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Check-in QR Code
-                  </h3>
+                  <span style={{ color: C.amber, background: `${C.amber}22` }} className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest">
+                    Confirmed
+                  </span>
+                </div>
+                <h1 className="mt-1 text-2xl font-black tracking-tight">Booking Confirmed!</h1>
+                <p className="mt-0.5 text-sm text-white/70">Your appointment has been successfully created.</p>
+              </div>
+              {/* appointment ID chip */}
+              <div style={{ background: "rgba(255,255,255,0.1)" }} className="hidden rounded-2xl px-4 py-3 sm:block">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Booking ID</p>
+                <p className="mt-0.5 font-mono text-base font-bold text-white">
+                  #{String(appointment._id).slice(-6).toUpperCase()}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+            {/* ── left: details + QR ── */}
+            <div className="space-y-5">
+              {/* details grid */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                style={{ background: "#fff", border: `1px solid ${C.border}` }}
+                className="rounded-3xl p-6 shadow-sm"
+              >
+                <h2 style={{ color: C.text }} className="mb-4 text-base font-bold">Appointment Details</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Service",    val: appointment.service?.name || svc.name },
+                    { label: "Business",   val: appointment.business?.businessName || svc.business },
+                    { label: "Date",       val: fmtDate(appointment.date) },
+                    { label: "Time",       val: appointment.time || "—" },
+                    { label: "Status",     val: appointment.status || "Pending", green: true },
+                    { label: "Booking ID", val: `#${String(appointment._id).slice(-6).toUpperCase()}`, mono: true },
+                  ].map(({ label, val, green, mono }) => (
+                    <div key={label} style={{ background: C.panel }} className="rounded-2xl p-3.5">
+                      <p style={{ color: C.muted }} className="text-[10px] font-semibold uppercase tracking-widest">{label}</p>
+                      <p style={{ color: green ? "#16a34a" : C.text }} className={`mt-1 break-words text-sm font-bold capitalize ${mono ? "font-mono" : ""}`}>
+                        {val}
+                      </p>
+                    </div>
+                  ))}
                 </div>
 
-                <p className="mt-1 text-sm text-slate-500">
-                  This QR code stores your appointment information for quick
-                  verification.
-                </p>
+                {appointment.notes && (
+                  <div style={{ background: C.panel, border: `1px solid ${C.border}` }} className="mt-3 rounded-2xl p-3.5">
+                    <p style={{ color: C.muted }} className="text-[10px] font-semibold uppercase tracking-widest">Your Note</p>
+                    <p style={{ color: C.text }} className="mt-1 text-sm">{appointment.notes}</p>
+                  </div>
+                )}
+              </motion.div>
 
-                <div className="mt-6 flex flex-col items-center gap-4">
-                  <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+              {/* QR */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                style={{ background: "#fff", border: `1px solid ${C.border}` }}
+                className="rounded-3xl p-6 shadow-sm"
+              >
+                <div className="mb-5 flex items-center gap-3">
+                  <div style={{ background: `${C.navy}0F` }} className="flex h-9 w-9 items-center justify-center rounded-xl">
+                    <Sparkles size={16} style={{ color: C.navy }} />
+                  </div>
+                  <div>
+                    <h3 style={{ color: C.text }} className="text-sm font-bold">Check-in QR Code</h3>
+                    <p style={{ color: C.muted }} className="text-xs">Show at the venue for instant verification</p>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <div style={{ border: `2px solid ${C.border}` }} className="inline-block rounded-2xl bg-white p-4 shadow-sm">
                     <QRCode
-                      size={190}
+                      size={140}
                       value={JSON.stringify({
-                        appointmentId: appointment._id,
-                        service: appointment.service?.name || summary.serviceName,
-                        business:
-                          appointment.business?.businessName ||
-                          appointment.service?.business?.businessName ||
-                          appointment.service?.business?.name ||
-                          summary.businessName,
+                        id: appointment._id,
+                        service: appointment.service?.name || svc.name,
+                        business: appointment.business?.businessName || svc.business,
                         date: appointment.date,
                         time: appointment.time,
                         status: appointment.status || "pending",
                       })}
                     />
                   </div>
-
-                  <p className="max-w-sm text-center text-xs text-slate-500">
-                    Show this QR code at the business if they use appointment
-                    verification.
-                  </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
-            <div className="rounded-[30px] border border-[#e8eef8] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-              <h3 className="text-xl font-black text-slate-900">
-                Reservation summary
-              </h3>
-
-              <div className="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
-                <img
-                  src={summary.serviceImage}
-                  alt={summary.serviceName}
-                  className="h-52 w-full object-cover"
-                />
-              </div>
-
-              <div className="mt-5 space-y-4">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Selected service
-                  </p>
-                  <p className="mt-2 text-base font-bold text-slate-900">
-                    {summary.serviceName}
-                  </p>
+            {/* ── right: summary + actions ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+              className="space-y-4"
+            >
+              <div style={{ background: "#fff", border: `1px solid ${C.border}` }} className="rounded-3xl p-5 shadow-sm">
+                <h3 style={{ color: C.text }} className="mb-4 text-base font-bold">Reservation Summary</h3>
+                <div className="overflow-hidden rounded-2xl" style={{ border: `1px solid ${C.border}` }}>
+                  <img src={svc.img} alt={svc.name} className="h-28 w-full object-cover" />
                 </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Price</span>
-                    <span className="font-bold text-emerald-600">
-                      {formatPriceMAD(summary.price)}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Duration</span>
-                    <span className="font-bold text-slate-900">
-                      {summary.duration} min
-                    </span>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Date</span>
-                    <span className="font-bold text-slate-900">
-                      {formatDisplayDate(appointment.date)}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Time</span>
-                    <span className="font-bold text-slate-900">
-                      {formatDisplayTime(appointment.time)}
-                    </span>
+                <div className="mt-4 space-y-2.5">
+                  {[
+                    { l: "Service",  v: svc.name },
+                    { l: "Business", v: svc.business },
+                    { l: "Duration", v: `${svc.duration} min` },
+                    { l: "Date",     v: fmtDate(appointment.date) },
+                    { l: "Time",     v: appointment.time || "—" },
+                  ].map(({ l, v }) => (
+                    <div key={l} className="flex justify-between text-sm">
+                      <span style={{ color: C.muted }}>{l}</span>
+                      <span style={{ color: C.text }} className="max-w-[55%] truncate text-right font-semibold capitalize">{v}</span>
+                    </div>
+                  ))}
+                  <div style={{ borderColor: C.border }} className="my-1 border-t border-dashed" />
+                  <div className="flex justify-between text-sm font-bold">
+                    <span style={{ color: C.text }}>Total Paid</span>
+                    <span style={{ color: C.amber }}>{fmtPrice(svc.price)}</span>
                   </div>
                 </div>
-
-                <button
-                  onClick={() => navigate("/account/appointments")}
-                  className="w-full rounded-2xl bg-[#132249] px-5 py-3.5 font-semibold text-white transition hover:opacity-90"
-                >
-                  View My Appointments
-                </button>
-
-                <button
-                  onClick={() => navigate("/businesses")}
-                  className="w-full rounded-2xl border border-slate-200 px-5 py-3.5 font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  Continue Browsing
-                </button>
               </div>
-            </div>
+
+              <button
+                onClick={() => navigate("/account/appointments")}
+                style={{ background: C.navy }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:opacity-90"
+              >
+                View My Appointments <ChevronRight size={15} />
+              </button>
+              <button
+                onClick={() => navigate("/businesses")}
+                style={{ border: `1px solid ${C.border}`, color: C.text }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-sm font-semibold transition hover:bg-slate-50"
+              >
+                Explore More Services
+              </button>
+            </motion.div>
           </div>
         </div>
       </div>
     );
   }
 
+  /* ════════════════════════════════════════
+     BOOKING FORM — split panel
+  ════════════════════════════════════════ */
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#eef4ff_0%,#f8fbff_40%,#f6f8fc_100%)] px-4 py-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+    <div style={{ background: C.canvas }} className="min-h-screen">
+      <Steps step={step} />
+
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        {/* back */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{ color: C.navy, border: `1px solid ${C.border}`, background: "#fff" }}
+          className="mb-6 inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold shadow-sm transition hover:bg-slate-50"
+        >
+          <ArrowLeft size={14} /> Back
+        </button>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] items-start">
+
+          {/* ══════════ LEFT — service hero panel ══════════ */}
+          <div className="lg:sticky lg:top-6 space-y-4">
+
+            {/* hero image card */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{ border: `1px solid ${C.border}` }}
+              className="overflow-hidden rounded-3xl bg-white shadow-sm"
+            >
+              {/* image */}
+              <div className="relative">
+                <img
+                  src={svc.img}
+                  alt={svc.name}
+                  className="h-52 w-full object-cover"
+                />
+                {/* overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                {/* verified badge */}
+                <div className="absolute left-4 top-4">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold text-emerald-700 backdrop-blur-sm">
+                    <ShieldCheck size={11} /> Verified
+                  </span>
+                </div>
+
+                {/* price pill — bottom right of image */}
+                <div
+                  style={{ background: C.amber }}
+                  className="absolute bottom-4 right-4 rounded-2xl px-3.5 py-2 text-right shadow-lg"
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-white/80">Price</p>
+                  <p className="text-base font-black text-white leading-tight">{fmtPrice(svc.price)}</p>
+                </div>
+
+                {/* title on image */}
+                <div className="absolute bottom-4 left-4 right-24">
+                  <h1 className="text-xl font-black leading-tight text-white drop-shadow-lg">
+                    {svc.name}
+                  </h1>
+                  {svc.city && (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-white/80">
+                      <MapPin size={10} /> {svc.city}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* body */}
+              <div className="p-5">
+                {/* business + rating row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div style={{ background: `${C.navy}0F` }} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                      <Building2 size={14} style={{ color: C.navy }} />
+                    </div>
+                    <div>
+                      <p style={{ color: C.muted }} className="text-[10px] font-semibold uppercase tracking-widest">Business</p>
+                      <p style={{ color: C.text }} className="text-sm font-bold leading-tight">{svc.business}</p>
+                    </div>
+                  </div>
+                  <Rating rating={svc.rating} count={svc.reviews} />
+                </div>
+
+                {/* description */}
+                <p style={{ color: C.muted }} className="mt-4 text-sm leading-6 line-clamp-3">
+                  {svc.desc}
+                </p>
+
+                {/* stats row */}
+                <div style={{ borderTop: `1px solid ${C.border}` }} className="mt-5 flex gap-5 pt-4">
+                  {[
+                    { icon: Timer,   label: "Duration", value: `${svc.duration} min` },
+                    { icon: CalendarDays, label: "Booking type", value: "Appointment" },
+                  ].map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="flex items-center gap-2.5">
+                      <div style={{ background: `${C.navy}0F` }} className="flex h-8 w-8 items-center justify-center rounded-lg">
+                        <Icon size={14} style={{ color: C.navy }} />
+                      </div>
+                      <div>
+                        <p style={{ color: C.muted }} className="text-[10px] font-semibold uppercase tracking-widest">{label}</p>
+                        <p style={{ color: C.text }} className="text-sm font-bold">{value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* trust card */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              style={{ border: `1px solid ${C.border}` }}
+              className="rounded-3xl bg-white p-5 shadow-sm"
+            >
+              <div className="space-y-3">
+                {[
+                  { icon: ShieldCheck, text: "Payments are secure & encrypted",   cls: "bg-emerald-50 text-emerald-600" },
+                  { icon: Zap,         text: "Instant booking confirmation",       cls: "bg-blue-50 text-blue-600" },
+                  { icon: RotateCcw,   text: "Free cancellation available",        cls: "bg-violet-50 text-violet-600" },
+                ].map(({ icon: Icon, text, cls }) => (
+                  <div key={text} className="flex items-center gap-3">
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${cls}`}>
+                      <Icon size={14} />
+                    </div>
+                    <span style={{ color: C.text }} className="text-sm">{text}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* ══════════ RIGHT — booking form ══════════ */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            style={{ border: `1px solid ${C.border}` }}
+            className="rounded-3xl bg-white shadow-sm"
           >
-            <ArrowLeft size={16} />
-            Back
-          </button>
-        </div>
-
-        <div className="mb-6 rounded-[28px] border border-[#e8eef8] bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-          <div className="mb-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-slate-700">
-                Booking progress
-              </span>
-              <span className="rounded-full bg-[#eef4ff] px-3 py-1 text-xs font-semibold text-[#1f57d2]">
-                In progress
-              </span>
-            </div>
-            <span className="text-sm font-semibold text-slate-400">
-              Step {currentStep}/3
-            </span>
-          </div>
-
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            {/* form header */}
             <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#132249_0%,#1f57d2_55%,#16a34a_100%)] transition-all duration-700 ease-out"
-              style={{ width: progressWidth }}
-            />
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-4 md:gap-7">
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-sm transition-all duration-500 ${
-                  currentStep >= 1
-                    ? "bg-[#132249] text-white"
-                    : "bg-slate-200 text-slate-600"
-                }`}
-              >
-                1
+              style={{ borderBottom: `1px solid ${C.border}` }}
+              className="flex items-center gap-3 px-6 py-5"
+            >
+              <div style={{ background: C.navy }} className="flex h-9 w-9 items-center justify-center rounded-xl">
+                <CalendarDays size={16} className="text-white" />
               </div>
-              <span
-                className={`text-sm font-semibold ${
-                  currentStep >= 1 ? "text-slate-700" : "text-slate-500"
-                }`}
-              >
-                Service
-              </span>
-            </div>
-
-            <div className="hidden h-px w-12 bg-slate-300 md:block" />
-
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-sm transition-all duration-500 ${
-                  currentStep >= 2
-                    ? "bg-[#132249] text-white"
-                    : "bg-slate-200 text-slate-600"
-                }`}
-              >
-                2
-              </div>
-              <span
-                className={`text-sm font-semibold ${
-                  currentStep >= 2 ? "text-slate-700" : "text-slate-500"
-                }`}
-              >
-                Date & Time
-              </span>
-            </div>
-
-            <div className="hidden h-px w-12 bg-slate-300 md:block" />
-
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-sm transition-all duration-500 ${
-                  currentStep >= 3
-                    ? "bg-emerald-500 text-white"
-                    : "bg-slate-200 text-slate-600"
-                }`}
-              >
-                3
-              </div>
-              <span
-                className={`text-sm font-semibold ${
-                  currentStep >= 3 ? "text-emerald-600" : "text-slate-500"
-                }`}
-              >
-                Confirmation
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.45fr_0.95fr]">
-          <div className="rounded-[30px] border border-[#e8eef8] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] md:p-8">
-            <div className="overflow-hidden rounded-[26px] border border-slate-200 bg-slate-50">
-              <img
-                src={summary.serviceImage}
-                alt={summary.serviceName}
-                className="h-72 w-full object-cover"
-              />
-            </div>
-
-            <div className="mt-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#eefbf3] px-3 py-1.5 text-xs font-semibold text-[#18794e]">
-                  <ShieldCheck size={14} />
-                  Verified service
-                </span>
-              </div>
-
-              <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
-                {summary.serviceName}
-              </h1>
-
-              <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
-                {summary.description}
-              </p>
-            </div>
-
-            <div className="mt-7 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[20px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Building2 size={16} />
-                  <span className="text-xs font-semibold uppercase tracking-wide">
-                    Business
-                  </span>
-                </div>
-                <p className="mt-3 text-base font-bold text-slate-900">
-                  {summary.businessName}
-                </p>
-              </div>
-
-              <div className="rounded-[20px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f7fffb_100%)] p-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <BadgeDollarSign size={16} />
-                  <span className="text-xs font-semibold uppercase tracking-wide">
-                    Price
-                  </span>
-                </div>
-                <p className="mt-3 text-base font-bold text-emerald-600">
-                  {formatPriceMAD(summary.price)}
-                </p>
-              </div>
-
-              <div className="rounded-[20px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#fbf9ff_100%)] p-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <TimerReset size={16} />
-                  <span className="text-xs font-semibold uppercase tracking-wide">
-                    Duration
-                  </span>
-                </div>
-                <p className="mt-3 text-base font-bold text-slate-900">
-                  {summary.duration} min
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div>
-                <label className="mb-3 block text-sm font-semibold text-slate-700">
-                  Choose a date
-                </label>
+                <h2 style={{ color: C.text }} className="text-base font-black">Schedule Your Appointment</h2>
+                <p style={{ color: C.muted }} className="text-xs">Select your preferred date and time below</p>
+              </div>
+            </div>
 
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-                  {nextDays.map((day) => {
-                    const selected = date === day.value;
+            <form onSubmit={handleBook} className="p-6 space-y-7">
 
+              {/* ── DATE ── */}
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <NavyDot />
+                    <h3 style={{ color: C.text }} className="text-sm font-bold">Choose a Date</h3>
+                  </div>
+                  {date && (
+                    <span
+                      style={{ background: `${C.navy}0F`, color: C.navy }}
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
+                    >
+                      {fmtShort(date)}
+                    </span>
+                  )}
+                </div>
+                <WeekPicker value={date} onChange={setDate} />
+              </div>
+
+              {/* ── TIME ── */}
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <NavyDot />
+                    <h3 style={{ color: C.text }} className="text-sm font-bold">Choose a Time</h3>
+                  </div>
+                  {time && (
+                    <span
+                      style={{ background: `${C.navy}0F`, color: C.navy }}
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
+                    >
+                      {time}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
+                  {SLOTS.map((slot) => {
+                    const sel = time === slot;
                     return (
-                      <button
-                        key={day.value}
-                        type="button"
-                        onClick={() => setDate(day.value)}
-                        className={`rounded-2xl border px-4 py-3 text-left transition-all ${
-                          selected
-                            ? "border-[#132249] bg-[#132249] text-white shadow-md"
-                            : "border-slate-200 bg-slate-50 text-slate-700 hover:border-[#c8d7f5] hover:bg-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <CalendarDays size={16} />
-                          <span className="text-sm font-semibold">
-                            {day.label}
-                          </span>
-                        </div>
-                      </button>
+                      <div key={slot} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setTime(slot)}
+                          style={{
+                            border: sel ? `1.5px solid ${C.navy}` : `1.5px solid ${C.border}`,
+                            color: sel ? "#fff" : C.text,
+                            background: sel ? "transparent" : C.panel,
+                          }}
+                          className="relative flex w-full items-center justify-center gap-1 rounded-xl py-2.5 text-xs font-semibold transition-all duration-150"
+                        >
+                          <AnimatePresence>
+                            {sel && (
+                              <motion.div
+                                layoutId="slot-bg"
+                                className="absolute inset-0 rounded-xl"
+                                style={{ background: C.navy }}
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.5, opacity: 0 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                              />
+                            )}
+                          </AnimatePresence>
+                          <Clock size={11} className="relative z-10 shrink-0" />
+                          <span className="relative z-10">{slot}</span>
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
-
-                <div className="mt-3">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Or choose another date
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    min={minDate}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm outline-none transition focus:border-[#132249] focus:bg-white"
-                    required
-                  />
-                </div>
               </div>
 
+              {/* ── NOTES ── */}
               <div>
-                <label className="mb-3 block text-sm font-semibold text-slate-700">
-                  Choose a time
-                </label>
-
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-                  {TIME_OPTIONS.map((option) => {
-                    const selected = time === option;
-
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => setTime(option)}
-                        className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition-all ${
-                          selected
-                            ? "border-[#132249] bg-[#132249] text-white shadow-md"
-                            : "border-slate-200 bg-slate-50 text-slate-700 hover:border-[#c8d7f5] hover:bg-white"
-                        }`}
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <Clock3 size={15} />
-                          {option}
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div className="mb-3 flex items-center gap-2">
+                  <NavyDot />
+                  <h3 style={{ color: C.text }} className="text-sm font-bold">
+                    Notes <span style={{ color: C.muted }} className="font-normal">(optional)</span>
+                  </h3>
                 </div>
-
-                <div className="mt-3">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Or enter another time
-                  </label>
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm outline-none transition focus:border-[#132249] focus:bg-white"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Notes
-                </label>
                 <div className="relative">
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    rows={4}
-                    placeholder="Optional note for the business..."
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-11 text-sm outline-none transition focus:border-[#132249] focus:bg-white"
+                    rows={3}
+                    placeholder="Any special requests for the business…"
+                    style={{ border: `1.5px solid ${C.border}`, background: C.panel, color: C.text }}
+                    className="w-full resize-none rounded-2xl px-4 py-3 pr-11 text-sm placeholder-slate-400 outline-none transition focus:ring-2 focus:ring-[#1a2e6e]/10"
+                    onFocus={(e) => (e.target.style.borderColor = C.navy)}
+                    onBlur={(e) => (e.target.style.borderColor = C.border)}
                   />
-                  <NotebookPen
-                    size={18}
-                    className="pointer-events-none absolute right-4 top-4 text-slate-400"
-                  />
+                  <NotebookPen size={15} style={{ color: C.muted }} className="pointer-events-none absolute right-4 top-3.5" />
                 </div>
               </div>
 
+              {/* ── SUMMARY INLINE ── */}
+              {(date || time) && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  style={{ background: `${C.navy}06`, border: `1.5px solid ${C.navy}18` }}
+                  className="overflow-hidden rounded-2xl px-4 py-4"
+                >
+                  <p style={{ color: C.navy }} className="mb-3 text-xs font-bold uppercase tracking-widest">Booking Preview</p>
+                  <div className="space-y-2">
+                    {[
+                      { l: "Service",  v: svc.name },
+                      { l: "Date",     v: date ? fmtDate(date) : "—" },
+                      { l: "Time",     v: time || "—" },
+                      { l: "Duration", v: `${svc.duration} min` },
+                    ].map(({ l, v }) => (
+                      <div key={l} className="flex justify-between text-sm">
+                        <span style={{ color: C.muted }}>{l}</span>
+                        <span style={{ color: C.text }} className="font-semibold capitalize">{v}</span>
+                      </div>
+                    ))}
+                    <div style={{ borderColor: C.border }} className="my-1 border-t border-dashed pt-2">
+                      <div className="flex justify-between text-sm font-bold">
+                        <span style={{ color: C.text }}>Total</span>
+                        <span style={{ color: C.amber }}>{fmtPrice(svc.price)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── ERROR ── */}
               {error && (
-                <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {error}
+                <div className="flex items-start gap-2.5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                  <span className="mt-0.5 shrink-0 text-red-500">⚠</span>
+                  <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
 
-              {successMessage && (
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">
-                  {successMessage}
-                </div>
-              )}
-
+              {/* ── SUBMIT ── */}
               <button
                 type="submit"
-                disabled={submitting}
-                className="w-full rounded-2xl bg-[#132249] px-5 py-4 text-base font-bold text-white shadow-[0_12px_24px_rgba(19,34,73,0.2)] transition hover:translate-y-[-1px] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={submitting || !date || !time}
+                style={{ background: C.navy }}
+                className="relative w-full overflow-hidden rounded-2xl py-4 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {submitting ? "Confirming..." : "Confirm Booking"}
+                {/* amber shimmer line on top */}
+                <span
+                  style={{ background: C.amber }}
+                  className="absolute inset-x-0 top-0 h-0.5 opacity-60"
+                />
+                {submitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Confirming…
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    Confirm Booking
+                    <ChevronRight size={16} />
+                  </span>
+                )}
               </button>
+
             </form>
-          </div>
+          </motion.div>
 
-          <div className="h-fit rounded-[30px] border border-[#e8eef8] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] xl:sticky xl:top-6">
-            <h2 className="text-2xl font-black text-slate-900">
-              Reservation summary
-            </h2>
-
-            <div className="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
-              <img
-                src={summary.serviceImage}
-                alt={summary.serviceName}
-                className="h-44 w-full object-cover"
-              />
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Service
-                </p>
-                <p className="mt-2 text-base font-bold text-slate-900">
-                  {summary.serviceName}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Price</span>
-                  <span className="font-bold text-emerald-600">
-                    {formatPriceMAD(summary.price)}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Duration</span>
-                  <span className="font-bold text-slate-900">
-                    {summary.duration} min
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Selected date</span>
-                  <span className="font-bold text-slate-900">
-                    {date ? formatDisplayDate(date) : "-"}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Selected time</span>
-                  <span className="font-bold text-slate-900">
-                    {time || "-"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
-                <p className="text-sm leading-6 text-slate-500">
-                  After confirmation, your appointment details and QR code will
-                  appear in the success screen.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
