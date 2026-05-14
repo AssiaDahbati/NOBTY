@@ -3,12 +3,13 @@
 <br />
 
 ```
-NOBTY -   Manage Your Time Wisely!
+
 ```
 
-### Modern Full-Stack Booking Marketplace
+### NOBTY -   Manage Your Time Wisely!
+Modern Full-Stack Booking Marketplace
 
-*Discover · Book · Review — All in one premium platform*
+*Discover · Book · Review — All in one  platform*
 
 <br />
 
